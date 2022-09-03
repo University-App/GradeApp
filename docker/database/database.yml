@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+
+  grade_database:
+    image: "postgres" # use latest official postgres version
+    container_name: grade_database
+    hostname: university.grade.database.fr
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=grade_database
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+
+  pg_admin:
+    image: "dpage/pgadmin4" # use latest official postgres version
+    container_name: pg_admin
+    hostname: university.pgAdmin.fr
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@email.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    restart: always
+    ports:
+      - "5051:80"
+    depends_on:
+      - grade_database
+
+
+volumes:
+  database-data: # named volumes can be managed easier using docker-compose
