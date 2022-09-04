@@ -18,10 +18,13 @@ func Init() *gorm.DB {
 	}
 
 	models := []interface{}{
-		&entities.Student{}, &entities.Note{}, &entities.Course{},
+		&entities.Student{}, &entities.Unite{}, &entities.Course{}, &entities.Note{},
 	}
-	// TODO handle error
-	database.AutoMigrate(models...)
+
+	err1 := database.Migrator().AutoMigrate(models...)
+	if err1 != nil {
+		panic("Cannot migrate models to the database ... ")
+	}
 
 	return database
 }
