@@ -17,7 +17,11 @@ func Init() *gorm.DB {
 		log.Fatalln(err)
 	}
 
-	database.AutoMigrate(&entities.Note{})
+	models := []interface{}{
+		&entities.Student{}, &entities.Note{}, &entities.Course{},
+	}
+	// TODO handle error
+	database.AutoMigrate(models...)
 
 	return database
 }

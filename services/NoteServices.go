@@ -11,7 +11,7 @@ type NoteService struct {
 }
 
 func NewNoteService(db *gorm.DB) NoteService {
-	return NoteService{repositories.NewRepository(db)}
+	return NoteService{repositories.NewNoteRepository(db)}
 }
 
 func (noteService NoteService) GetAllNotes() []entities.Note {

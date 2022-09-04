@@ -1,6 +1,10 @@
 package entities
 
+import "gorm.io/gorm"
+
 type Note struct {
-	ID     int `json:"id" gorm:"primaryKey;autoIncrement; unique; not null"`
-	Nombre int `json:"nombre"`
+	gorm.Model
+	Nombre    int  `json:"nombre"`
+	StudentID uint `json:"studentId"`
+	CourseID  uint `json:"courseId"`
 }

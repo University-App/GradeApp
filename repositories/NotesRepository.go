@@ -10,7 +10,7 @@ type NoteRepository struct {
 	DB *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) NoteRepository {
+func NewNoteRepository(db *gorm.DB) NoteRepository {
 	return NoteRepository{db}
 }
 
