@@ -1,6 +1,9 @@
 package entities
 
-type UE struct {
-	Name    string
-	Courses [4]Course
+import "gorm.io/gorm"
+
+type Unite struct {
+	gorm.Model
+	Name    string   `json:"name"`
+	Courses []Course `json:"courses"`
 }
