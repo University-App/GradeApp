@@ -1,9 +1,11 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+)
 
 type Unite struct {
-	gorm.Model
-	Name    string   `json:"name"`
-	Courses []Course `json:"courses"`
+	ID      uuid.UUID `json:"ID" gorm:"PrimaryKey;unique"`
+	Name    string    `json:"name"`
+	Courses []Course  `json:"courses" gorm:"foreignKey:UniteID"`
 }

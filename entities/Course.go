@@ -1,10 +1,12 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+)
 
 type Course struct {
-	gorm.Model
-	Name    string ` json:"name"`
-	Notes   []Note `json:"notes"`
-	UniteID uint   `json:"ueid"`
+	ID      uuid.UUID `json:"ID" gorm:"PrimaryKey;unique"`
+	UniteID uuid.UUID `json:"ueid" gorm:"foreignKey:ID"`
+	Name    string    `json:"name"`
+	Notes   []Note    `json:"notes" gorm:"foreignKey:CourseID"`
 }
