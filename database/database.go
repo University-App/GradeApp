@@ -1,7 +1,6 @@
 package database
 
 import (
-	"github.com/google/uuid"
 	"github.com/paulmarie/univesity/grade_app/entities"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -36,12 +35,10 @@ func seedDatabase(db *gorm.DB) {
 
 	students := []entities.Student{
 		{
-			ID:        uuid.New(),
 			LastName:  "LN1",
 			FirstName: "FN1",
 		},
 		{
-			ID:        uuid.New(),
 			LastName:  "LN2",
 			FirstName: "FN2",
 		},
@@ -53,30 +50,24 @@ func seedDatabase(db *gorm.DB) {
 
 	ues := []entities.Unite{
 		{
-			ID:   uuid.New(),
 			Name: "UE1",
 		},
 		{
-			ID:   uuid.New(),
 			Name: "UE2",
 		},
 	}
 
 	courses := []entities.Course{
 		{
-			ID:   uuid.New(),
 			Name: "Course1",
 		},
 		{
-			ID:   uuid.New(),
 			Name: "Course2",
 		},
 		{
-			ID:   uuid.New(),
 			Name: "Course3",
 		},
 		{
-			ID:   uuid.New(),
 			Name: "Course4",
 		},
 	}
@@ -84,47 +75,47 @@ func seedDatabase(db *gorm.DB) {
 	for _, ue := range ues {
 		db.Create(&ue)
 	}
+	var uesFromDB []entities.Unite
+	db.Find(&uesFromDB)
+
 	for index := range courses {
 		if index%2 == 0 {
-			db.Model(&ues[0]).Association("Courses").Append(&courses[index])
+			db.Model(&uesFromDB[0]).Association("Courses").Append(&courses[index])
 		} else {
-			db.Model(&ues[1]).Association("Courses").Append(&courses[index])
+			db.Model(&uesFromDB[1]).Association("Courses").Append(&courses[index])
 		}
 	}
 
+	var coursesFromDB []entities.Course
+	db.Find(&coursesFromDB)
+
 	notes := []entities.Note{
 		{
-			ID:        uuid.New(),
-			Nombre:    19,
-			StudentID: students[0].ID,
+			Nombre:     19,
+			CourseName: "Course1",
 		},
 		{
-			ID:        uuid.New(),
-			Nombre:    10,
-			StudentID: students[0].ID,
+			Nombre:     10,
+			CourseName: "Course2",
 		},
 		{
-			ID:        uuid.New(),
-			Nombre:    15,
-			StudentID: students[0].ID,
+			Nombre:     15,
+			CourseName: "Course3",
 		},
 		{
-			ID:        uuid.New(),
-			Nombre:    18,
-			StudentID: students[0].ID,
+			Nombre:     18,
+			CourseName: "Course4",
 		},
-	}
-	for index := range courses {
-		db.Model(&courses[index]).Association("Notes").Append(&notes)
-	}
-	for index := range students {
-		db.Model(&students[index]).Association("Courses").Append(&courses)
 	}
 
-	//
-	//var course1 entities.Course
-	//db.First(&course1, "Name = ?", "Course1")
-	//db.Model(&students[0]).Association("Courses").Append(&course1)
-	//for index := range students {
-	//}
+	var studentsFromDB []entities.Student
+	db.Find(&studentsFromDB)
+	for index := range studentsFromDB {
+		db.Model(&studentsFromDB[index]).Association("Courses").Append(&coursesFromDB)
+	}
+	for index := range studentsFromDB {
+		for indexNote := range notes {
+			db.Model(&studentsFromDB[index]).Association("Notes").Append([]entities.Note{notes[indexNote]})
+		}
+	}
 }
