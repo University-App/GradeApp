@@ -30,3 +30,40 @@ func (noteRepository NoteRepository) AddNote(note *entities.Note) entities.Note 
 	}
 	return *note
 }
+
+func (noteRepository NoteRepository) FindAllNotesOfStudent(studentID uint) []entities.Note {
+	var notes []entities.Note
+
+	if result := noteRepository.DB.Where("student_id = ?", studentID).Find(&notes); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+
+	return notes
+}
+
+func (noteRepository NoteRepository) FindAllStudents() []entities.Student {
+	var students []entities.Student
+
+	if result := noteRepository.DB.Find(&students); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+	return students
+}
+
+func (noteRepository NoteRepository) FindAllCourses() []entities.Course {
+	var courses []entities.Course
+
+	if result := noteRepository.DB.Find(&courses); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+	return courses
+}
+
+func (noteRepository NoteRepository) FindAllUnites() []entities.Unite {
+	var unites []entities.Unite
+
+	if result := noteRepository.DB.Find(&unites); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+	return unites
+}

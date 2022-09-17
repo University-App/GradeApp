@@ -7,12 +7,17 @@ import (
 )
 
 func SetUpRoutes(app *fiber.App, noteController controllers.NoteController, studentController controllers.StudentController) {
-	app.Get("/", noteController.HelloWorld)
-	app.Get("/allNotes", noteController.GetAllNotes)
 	app.Post("/newNote", noteController.AddNote)
-	app.Get("/average", noteController.GetAverage)
 	app.Get("/allStudents", studentController.GetAllStudents)
 	app.Post("/newStudent", studentController.AddStudent)
+
+	app.Get("/studentsGlobalAverages", noteController.GetStudentsGlobalAverages)
+	app.Get("/studentsUnitesAverages", noteController.GetStudentsUnitesAverages)
+	app.Get("/studentsCoursesAverages", noteController.GetStudentsCoursesAverages)
+
+	app.Get("/gobalAverage", noteController.GetGobalAverage)
+	app.Get("/uniteAverages", noteController.GetUniteAverages)
+	app.Get("/coursesAverages", noteController.GetCoursesAverages)
 }
 
 func main() {
