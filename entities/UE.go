@@ -1,9 +1,7 @@
 package entities
 
-import "gorm.io/gorm"
-
 type Unite struct {
-	gorm.Model
+	ID      uint     `json:"ID" gorm:"PrimaryKey;unique;autoIncrement"`
 	Name    string   `json:"name"`
 	Courses []Course `json:"courses"`
 }

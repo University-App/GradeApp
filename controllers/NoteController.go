@@ -15,15 +15,6 @@ func NewNoteController(db *gorm.DB) NoteController {
 	return NoteController{services.NewNoteService(db)}
 }
 
-func (noteController NoteController) HelloWorld(ctx *fiber.Ctx) error {
-	return ctx.SendString("Hello World!")
-}
-
-func (noteController NoteController) GetAllNotes(ctx *fiber.Ctx) error {
-
-	return ctx.JSON(noteController.noteServices.GetAllNotes())
-}
-
 func (noteController NoteController) AddNote(ctx *fiber.Ctx) error {
 	note := new(entities.Note)
 
@@ -34,6 +25,38 @@ func (noteController NoteController) AddNote(ctx *fiber.Ctx) error {
 	return ctx.JSON(noteController.noteServices.AddNote(note))
 }
 
-func (noteController NoteController) GetAverage(ctx *fiber.Ctx) error {
-	return ctx.JSON(noteController.noteServices.ComputeAverage())
+func (noteController NoteController) GetStudentsGlobalAverages(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.ComputeGlobalAverageForEachStudent())
+}
+
+func (noteController NoteController) GetStudentsUnitesAverages(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.ComputeUniteAverageForEachStudent())
+}
+
+func (noteController NoteController) GetStudentsCoursesAverages(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.ComputeCourseAverageForEachStudent())
+}
+
+func (noteController NoteController) GetGobalAverage(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.ComputeGlobalAverage())
+}
+
+func (noteController NoteController) GetUniteAverages(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.ComputeAverageForEachUnites())
+}
+
+func (noteController NoteController) GetCoursesAverages(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.ComputeAverageForEachCourse())
+}
+
+func (noteController NoteController) GetGlobalRankStudents(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.DetermineGlobalRankForEachStudent())
+}
+
+func (noteController NoteController) GetUnitesRankStudents(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.DetermineUnitesRankForEachStudent())
+}
+
+func (noteController NoteController) GetCoursesRankStudents(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.DetermineCoursesRankForEachStudent())
 }
