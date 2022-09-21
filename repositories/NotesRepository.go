@@ -67,3 +67,51 @@ func (noteRepository NoteRepository) FindAllUnites() []entities.Unite {
 	}
 	return unites
 }
+
+func (noteRepository NoteRepository) CreateStudentGlobalAverage(studentGlobalAverage entities.StudentGlobalAverage) {
+
+	if result := noteRepository.DB.Create(&studentGlobalAverage); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+}
+
+func (noteRepository NoteRepository) CreateStudentUniteAverage(studentUniteAverage entities.StudentUniteAverage) {
+
+	if result := noteRepository.DB.Create(&studentUniteAverage); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+}
+
+func (noteRepository NoteRepository) CreateStudentCourseAverage(studentCourseAverage entities.StudentCourseAverage) {
+
+	if result := noteRepository.DB.Create(&studentCourseAverage); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+}
+
+func (noteRepository NoteRepository) FindAllStudentGlobalAverage() []entities.StudentGlobalAverage {
+	var studentGlobalAverages []entities.StudentGlobalAverage
+
+	if result := noteRepository.DB.Find(&studentGlobalAverages); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+	return studentGlobalAverages
+}
+
+func (noteRepository NoteRepository) FindAllStudentUnitesAverage() []entities.StudentUniteAverage {
+	var studentUniteAverages []entities.StudentUniteAverage
+
+	if result := noteRepository.DB.Find(&studentUniteAverages); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+	return studentUniteAverages
+}
+
+func (noteRepository NoteRepository) FindAllStudentCoursesAverage() []entities.StudentCourseAverage {
+	var studentCourseAverages []entities.StudentCourseAverage
+
+	if result := noteRepository.DB.Find(&studentCourseAverages); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+	return studentCourseAverages
+}

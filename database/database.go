@@ -19,6 +19,9 @@ func Init() *gorm.DB {
 
 	models := []interface{}{
 		&entities.Student{}, &entities.Unite{}, &entities.Course{}, &entities.Note{},
+		&entities.GlobalAverage{}, &entities.CourseAverage{}, &entities.UniteAverage{},
+		&entities.StudentUniteAverage{}, &entities.StudentCourseAverage{}, &entities.StudentGlobalAverage{},
+		&entities.StudentAverage{},
 	}
 
 	err1 := database.Migrator().AutoMigrate(models...)
@@ -89,7 +92,7 @@ func seedDatabase(db *gorm.DB) {
 	var coursesFromDB []entities.Course
 	db.Find(&coursesFromDB)
 
-	notes := []entities.Note{
+	notesStudent1 := []entities.Note{
 		{
 			Nombre:     19,
 			CourseName: "Course1",
@@ -107,15 +110,37 @@ func seedDatabase(db *gorm.DB) {
 			CourseName: "Course4",
 		},
 	}
+	notesStudent2 := []entities.Note{
+		{
+			Nombre:     15,
+			CourseName: "Course1",
+		},
+		{
+			Nombre:     8,
+			CourseName: "Course2",
+		},
+		{
+			Nombre:     10,
+			CourseName: "Course3",
+		},
+		{
+			Nombre:     20,
+			CourseName: "Course4",
+		},
+	}
 
 	var studentsFromDB []entities.Student
 	db.Find(&studentsFromDB)
 	for index := range studentsFromDB {
 		db.Model(&studentsFromDB[index]).Association("Courses").Append(&coursesFromDB)
 	}
-	for index := range studentsFromDB {
-		for indexNote := range notes {
-			db.Model(&studentsFromDB[index]).Association("Notes").Append([]entities.Note{notes[indexNote]})
-		}
+
+	for indexNote := range notesStudent1 {
+		db.Model(&studentsFromDB[0]).Association("Notes").Append([]entities.Note{notesStudent1[indexNote]})
 	}
+
+	for indexNote := range notesStudent2 {
+		db.Model(&studentsFromDB[1]).Association("Notes").Append([]entities.Note{notesStudent2[indexNote]})
+	}
+
 }

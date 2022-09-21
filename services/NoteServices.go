@@ -4,6 +4,7 @@ import (
 	"github.com/paulmarie/univesity/grade_app/entities"
 	"github.com/paulmarie/univesity/grade_app/repositories"
 	"gorm.io/gorm"
+	"sort"
 )
 
 type NoteService struct {
@@ -19,26 +20,27 @@ func (noteService NoteService) AddNote(note *entities.Note) entities.Note {
 	return noteService.reposiroty.AddNote(note)
 }
 
-func (noteService NoteService) ComputeGlobalAverageForEachStudent() []entities.StudentAverage {
-	var studentsGlobalAverages []entities.StudentAverage
+func (noteService NoteService) ComputeGlobalAverageForEachStudent() []entities.StudentGlobalAverage {
+	var studentsGlobalAverages []entities.StudentGlobalAverage
 
 	students := noteService.reposiroty.FindAllStudents()
 
 	for _, student := range students {
 		gobalAverageResult := 0
 		var notes []entities.Note
-		var globalAverage entities.StudentAverage
+		var globalAverage entities.StudentGlobalAverage
 		notes = noteService.reposiroty.FindAllNotesOfStudent(student.ID)
 		if len(notes) > 0 {
 			for _, note := range notes {
 				gobalAverageResult += note.Nombre
 			}
 
-			globalAverage.Average = gobalAverageResult / len(notes)
+			globalAverage.StudentAverage.Average = gobalAverageResult / len(notes)
 		}
-		globalAverage.StudentName = student.FirstName + "-" + student.LastName
+		globalAverage.StudentAverage.StudentName = student.FirstName + "-" + student.LastName
 
 		studentsGlobalAverages = append(studentsGlobalAverages, globalAverage)
+		noteService.reposiroty.CreateStudentGlobalAverage(globalAverage)
 	}
 
 	return studentsGlobalAverages
@@ -54,7 +56,7 @@ func (noteService NoteService) ComputeUniteAverageForEachStudent() []entities.St
 	for _, student := range students {
 		for _, unite := range unites {
 			var notes []entities.Note
-			var courseAverage entities.StudentUniteAverage
+			var studentUniteAverage entities.StudentUniteAverage
 			notes = noteService.reposiroty.FindAllNotesOfStudent(student.ID)
 			courseAverageResult := 0
 			compteur := 0
@@ -69,10 +71,11 @@ func (noteService NoteService) ComputeUniteAverageForEachStudent() []entities.St
 						}
 					}
 				}
-				courseAverage.StudentAverage.Average = courseAverageResult / compteur
-				courseAverage.UniteName = unite.Name
-				courseAverage.StudentAverage.StudentName = student.FirstName + "-" + student.LastName
-				studentUniteAverages = append(studentUniteAverages, courseAverage)
+				studentUniteAverage.StudentAverage.Average = courseAverageResult / compteur
+				studentUniteAverage.UniteName = unite.Name
+				studentUniteAverage.StudentAverage.StudentName = student.FirstName + "-" + student.LastName
+				studentUniteAverages = append(studentUniteAverages, studentUniteAverage)
+				noteService.reposiroty.CreateStudentUniteAverage(studentUniteAverage)
 			}
 		}
 	}
@@ -87,7 +90,7 @@ func (noteService NoteService) ComputeCourseAverageForEachStudent() []entities.S
 
 	for _, student := range students {
 		var notes []entities.Note
-		var courseAverage entities.StudentCourseAverage
+		var studentCourseAverage entities.StudentCourseAverage
 		notes = noteService.reposiroty.FindAllNotesOfStudent(student.ID)
 		if len(notes) > 0 {
 			for _, course := range courses {
@@ -99,10 +102,11 @@ func (noteService NoteService) ComputeCourseAverageForEachStudent() []entities.S
 						compteur++
 					}
 				}
-				courseAverage.StudentAverage.Average = courseAverageResult / compteur
-				courseAverage.StudentAverage.StudentName = student.FirstName + "-" + student.LastName
-				courseAverage.CourseName = course.Name
-				studentCourseAverages = append(studentCourseAverages, courseAverage)
+				studentCourseAverage.StudentAverage.Average = courseAverageResult / compteur
+				studentCourseAverage.StudentAverage.StudentName = student.FirstName + "-" + student.LastName
+				studentCourseAverage.CourseName = course.Name
+				studentCourseAverages = append(studentCourseAverages, studentCourseAverage)
+				noteService.reposiroty.CreateStudentCourseAverage(studentCourseAverage)
 			}
 		}
 	}
@@ -121,8 +125,8 @@ func (noteService NoteService) ComputeGlobalAverage() entities.GlobalAverage {
 	}
 	average /= len(notes)
 	return entities.GlobalAverage{
-		average,
-		"Global average of promotion",
+		Average:       average,
+		PromotionName: "Global average of promotion",
 	}
 }
 
@@ -181,4 +185,77 @@ func (noteService NoteService) ComputeAverageForEachCourse() []entities.CourseAv
 		}
 	}
 	return courseAverages
+}
+
+func (noteService NoteService) DetermineGlobalRankForEachStudent() []entities.GlobalRank {
+	studentGlobalAverages := noteService.reposiroty.FindAllStudentGlobalAverage()
+	var globalRanks []entities.GlobalRank
+	sort.Slice(studentGlobalAverages, func(i, j int) bool {
+		return studentGlobalAverages[i].StudentAverage.Average > studentGlobalAverages[j].StudentAverage.Average
+	})
+
+	for index := range studentGlobalAverages {
+		var globalRank entities.GlobalRank
+
+		globalRank.Rank = index + 1
+		globalRank.StudentAverage = studentGlobalAverages[index].StudentAverage
+		globalRanks = append(globalRanks, globalRank)
+	}
+	return globalRanks
+}
+
+func (noteService NoteService) DetermineUnitesRankForEachStudent() [][]entities.GlobalRank {
+	studentGlobalAverages := noteService.reposiroty.FindAllStudentUnitesAverage()
+	unites := noteService.reposiroty.FindAllUnites()
+
+	var globalRankss [][]entities.GlobalRank
+	for _, unite := range unites {
+		var averages []entities.StudentUniteAverage
+		var globalRanks []entities.GlobalRank
+		for _, studentGlobalAverage := range studentGlobalAverages {
+			if studentGlobalAverage.UniteName == unite.Name {
+				averages = append(averages, studentGlobalAverage)
+			}
+		}
+		sort.Slice(averages, func(i, j int) bool {
+			return averages[i].StudentAverage.Average > averages[j].StudentAverage.Average
+		})
+		for index := range averages {
+			var globalRank entities.GlobalRank
+
+			globalRank.Rank = index + 1
+			globalRank.StudentAverage = averages[index].StudentAverage
+			globalRanks = append(globalRanks, globalRank)
+		}
+		globalRankss = append(globalRankss, globalRanks)
+	}
+	return globalRankss
+}
+
+func (noteService NoteService) DetermineCoursesRankForEachStudent() [][]entities.GlobalRank {
+	studentCourseAverages := noteService.reposiroty.FindAllStudentCoursesAverage()
+	courses := noteService.reposiroty.FindAllCourses()
+
+	var globalRankss [][]entities.GlobalRank
+	for _, course := range courses {
+		var averages []entities.StudentCourseAverage
+		var globalRanks []entities.GlobalRank
+		for _, studentCourseAverage := range studentCourseAverages {
+			if studentCourseAverage.CourseName == course.Name {
+				averages = append(averages, studentCourseAverage)
+			}
+		}
+		sort.Slice(averages, func(i, j int) bool {
+			return averages[i].StudentAverage.Average > averages[j].StudentAverage.Average
+		})
+		for index := range averages {
+			var globalRank entities.GlobalRank
+
+			globalRank.Rank = index + 1
+			globalRank.StudentAverage = averages[index].StudentAverage
+			globalRanks = append(globalRanks, globalRank)
+		}
+		globalRankss = append(globalRankss, globalRanks)
+	}
+	return globalRankss
 }

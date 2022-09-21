@@ -18,6 +18,10 @@ func SetUpRoutes(app *fiber.App, noteController controllers.NoteController, stud
 	app.Get("/gobalAverage", noteController.GetGobalAverage)
 	app.Get("/uniteAverages", noteController.GetUniteAverages)
 	app.Get("/coursesAverages", noteController.GetCoursesAverages)
+
+	app.Get("/globalRanks", noteController.GetGlobalRankStudents)
+	app.Get("/unitesRanks", noteController.GetUnitesRankStudents)
+	app.Get("/coursesRanks", noteController.GetCoursesRankStudents)
 }
 
 func main() {

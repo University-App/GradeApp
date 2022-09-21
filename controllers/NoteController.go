@@ -30,7 +30,7 @@ func (noteController NoteController) GetStudentsGlobalAverages(ctx *fiber.Ctx) e
 }
 
 func (noteController NoteController) GetStudentsUnitesAverages(ctx *fiber.Ctx) error {
-	return ctx.JSON(noteController.noteServices.ComputeCourseAverageForEachStudent())
+	return ctx.JSON(noteController.noteServices.ComputeUniteAverageForEachStudent())
 }
 
 func (noteController NoteController) GetStudentsCoursesAverages(ctx *fiber.Ctx) error {
@@ -47,4 +47,16 @@ func (noteController NoteController) GetUniteAverages(ctx *fiber.Ctx) error {
 
 func (noteController NoteController) GetCoursesAverages(ctx *fiber.Ctx) error {
 	return ctx.JSON(noteController.noteServices.ComputeAverageForEachCourse())
+}
+
+func (noteController NoteController) GetGlobalRankStudents(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.DetermineGlobalRankForEachStudent())
+}
+
+func (noteController NoteController) GetUnitesRankStudents(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.DetermineUnitesRankForEachStudent())
+}
+
+func (noteController NoteController) GetCoursesRankStudents(ctx *fiber.Ctx) error {
+	return ctx.JSON(noteController.noteServices.DetermineCoursesRankForEachStudent())
 }
