@@ -3,5 +3,5 @@ packages:
     - path: "./database/sqlc"
       name: "grade_database"
       engine: "postgresql"
-      schema: "./docker/database/migration/"
+      schema: "./docker/database/migration/dev"
       queries: "./database/query/"
