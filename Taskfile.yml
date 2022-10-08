@@ -1,0 +1,40 @@
+version: '3'
+
+tasks:
+  hello:
+    cmds:
+      - echo 'Hello World from Task!'
+    silent: true
+
+
+  database-up:
+    cmds:
+      - docker compose -f ./docker/database/database.yml up -d
+
+  database-down:
+    cmds:
+      - docker compose -f ./docker/database/database.yml down -v
+
+  migrate-up :
+    cmds:
+      -  migrate -path docker/database/migration -database "postgresql://user:password@university.grade.database.fr:5432/grade?sslmode=disable" -verbose up
+
+  migrate-down :
+    cmds:
+      -  migrate -path docker/database/migration -database "postgresql://user:password@university.grade.database.fr:5432/grade?sslmode=disable" -verbose down
+
+  createdb:
+    cmds:
+      - docker exec -it grade_database createdb --username=user --owner=user grade
+
+  dropdb:
+    cmds:
+      - docker exec -it grade_database drop grade
+
+  sqlc:
+    cmds:
+      - sqlc generate
+
+  test:
+    cmds:
+      - go test -v -cover ./...
