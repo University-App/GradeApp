@@ -1,0 +1,7 @@
+version: 1
+packages:
+    - path: "./database/sqlc"
+      name: "grade_database"
+      engine: "postgresql"
+      schema: "./docker/database/migration/"
+      queries: "./database/query/"
