@@ -14,11 +14,17 @@ type Course struct {
 	UniteID    sql.NullInt32
 }
 
-type Grade struct {
+type CourseAverage struct {
 	ID         int32
-	Number     int32
 	CourseName string
-	StudentID  sql.NullInt32
+	Average    int32
+}
+
+type Grade struct {
+	ID          int32
+	GradeNumber int32
+	CourseName  string
+	StudentID   sql.NullInt32
 }
 
 type Student struct {
