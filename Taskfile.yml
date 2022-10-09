@@ -17,19 +17,23 @@ tasks:
 
   migrate-up :
     cmds:
-      -  migrate -path docker/database/migration -database "postgresql://user:password@university.grade.database.fr:5432/grade?sslmode=disable" -verbose up
+      -  migrate -path docker/database/migration/dev -database "postgresql://user:password@university.grade.database.fr:5432/grade_dev?sslmode=disable" -verbose up
+      -  migrate -path docker/database/migration/test -database "postgresql://user:password@university.grade.database.fr:5432/grade_test?sslmode=disable" -verbose up
 
   migrate-down :
     cmds:
-      -  migrate -path docker/database/migration -database "postgresql://user:password@university.grade.database.fr:5432/grade?sslmode=disable" -verbose down
+      -  migrate -path docker/database/migration/dev -database "postgresql://user:password@university.grade.database.fr:5432/grade_dev?sslmode=disable" -verbose down
+      -  migrate -path docker/database/migration/test -database "postgresql://user:password@university.grade.database.fr:5432/grade_test?sslmode=disable" -verbose down
 
-  createdb:
+  createdbs:
     cmds:
-      - docker exec -it grade_database createdb --username=user --owner=user grade
+      - docker exec -it grade_database createdb --username=user --owner=user grade_dev
+      - docker exec -it grade_database createdb --username=user --owner=user grade_test
 
-  dropdb:
+  dropdbs:
     cmds:
-      - docker exec -it grade_database drop grade
+      - docker exec -it grade_database drop grade_dev
+      - docker exec -it grade_database drop grade_test
 
   sqlc:
     cmds:

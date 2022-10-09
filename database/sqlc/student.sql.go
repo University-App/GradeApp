@@ -30,13 +30,28 @@ func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (S
 	return i, err
 }
 
-const deleteStudent = `-- name: DeleteStudent :exec
+const deleteStudentByFirstLastName = `-- name: DeleteStudentByFirstLastName :exec
+DELETE FROM "Student"
+WHERE first_name = $1 AND last_name = $2
+`
+
+type DeleteStudentByFirstLastNameParams struct {
+	FirstName string
+	LastName  string
+}
+
+func (q *Queries) DeleteStudentByFirstLastName(ctx context.Context, arg DeleteStudentByFirstLastNameParams) error {
+	_, err := q.db.ExecContext(ctx, deleteStudentByFirstLastName, arg.FirstName, arg.LastName)
+	return err
+}
+
+const deleteStudentById = `-- name: DeleteStudentById :exec
 DELETE FROM "Student"
 WHERE id = $1
 `
 
-func (q *Queries) DeleteStudent(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteStudent, id)
+func (q *Queries) DeleteStudentById(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteStudentById, id)
 	return err
 }
 
@@ -47,6 +62,23 @@ WHERE id = $1 LIMIT 1
 
 func (q *Queries) GetStudent(ctx context.Context, id int32) (Student, error) {
 	row := q.db.QueryRowContext(ctx, getStudent, id)
+	var i Student
+	err := row.Scan(&i.ID, &i.LastName, &i.FirstName)
+	return i, err
+}
+
+const getStudentByFirstLastName = `-- name: GetStudentByFirstLastName :one
+SELECT id, last_name, first_name FROM "Student"
+WHERE first_name = $1 AND last_name = $2 LIMIT 1
+`
+
+type GetStudentByFirstLastNameParams struct {
+	FirstName string
+	LastName  string
+}
+
+func (q *Queries) GetStudentByFirstLastName(ctx context.Context, arg GetStudentByFirstLastNameParams) (Student, error) {
+	row := q.db.QueryRowContext(ctx, getStudentByFirstLastName, arg.FirstName, arg.LastName)
 	var i Student
 	err := row.Scan(&i.ID, &i.LastName, &i.FirstName)
 	return i, err
@@ -80,7 +112,34 @@ func (q *Queries) ListStudents(ctx context.Context) ([]Student, error) {
 	return items, nil
 }
 
-const updateStudent = `-- name: UpdateStudent :one
+const updateStudentByFirstLastName = `-- name: UpdateStudentByFirstLastName :one
+UPDATE "Student"
+set first_name = $3,
+    last_name = $4
+WHERE first_name = $1 AND last_name = $2
+    RETURNING id, last_name, first_name
+`
+
+type UpdateStudentByFirstLastNameParams struct {
+	FirstName   string
+	LastName    string
+	FirstName_2 string
+	LastName_2  string
+}
+
+func (q *Queries) UpdateStudentByFirstLastName(ctx context.Context, arg UpdateStudentByFirstLastNameParams) (Student, error) {
+	row := q.db.QueryRowContext(ctx, updateStudentByFirstLastName,
+		arg.FirstName,
+		arg.LastName,
+		arg.FirstName_2,
+		arg.LastName_2,
+	)
+	var i Student
+	err := row.Scan(&i.ID, &i.LastName, &i.FirstName)
+	return i, err
+}
+
+const updateStudentById = `-- name: UpdateStudentById :one
 UPDATE "Student"
 set first_name = $2,
     last_name = $3
@@ -88,14 +147,14 @@ WHERE id = $1
     RETURNING id, last_name, first_name
 `
 
-type UpdateStudentParams struct {
+type UpdateStudentByIdParams struct {
 	ID        int32
 	FirstName string
 	LastName  string
 }
 
-func (q *Queries) UpdateStudent(ctx context.Context, arg UpdateStudentParams) (Student, error) {
-	row := q.db.QueryRowContext(ctx, updateStudent, arg.ID, arg.FirstName, arg.LastName)
+func (q *Queries) UpdateStudentById(ctx context.Context, arg UpdateStudentByIdParams) (Student, error) {
+	row := q.db.QueryRowContext(ctx, updateStudentById, arg.ID, arg.FirstName, arg.LastName)
 	var i Student
 	err := row.Scan(&i.ID, &i.LastName, &i.FirstName)
 	return i, err
