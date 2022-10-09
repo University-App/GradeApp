@@ -40,7 +40,7 @@ ALTER TABLE "Student_Course" ADD FOREIGN KEY ("Course_id") REFERENCES "Course" (
 
 ----------------------------------------------------------------------------------------
 /*
-    SEEDING THE DATABASE FOR TESTING
+    SEEDING TEST DATABASE
  */
 
 INSERT INTO "Student" (id, last_name, first_name) VALUES (1, 'Djek', 'Pm');
