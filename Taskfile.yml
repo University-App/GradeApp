@@ -42,3 +42,7 @@ tasks:
   test:
     cmds:
       - go test -v -cover ./...
+
+  server-start:
+    cmds:
+      - go run ./app/main.go

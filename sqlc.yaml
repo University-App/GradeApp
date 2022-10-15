@@ -1,7 +1,7 @@
 version: 1
 packages:
-    - path: "./database/sqlc"
+    - path: "./persistence/sqlc"
       name: "grade_database"
       engine: "postgresql"
       schema: "./docker/database/migration/dev"
-      queries: "./database/query/"
+      queries: "./persistence/query/"

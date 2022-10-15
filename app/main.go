@@ -1,41 +1,31 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/paulmarie/univesity/grade_app/controllers"
-	"github.com/paulmarie/univesity/grade_app/database"
+	"database/sql"
+	"github.com/paulmarie/univesity/grade_app/api"
+	grade_database "github.com/paulmarie/univesity/grade_app/persistence/sqlc"
+	"log"
+
+	_ "github.com/lib/pq"
 )
 
-func SetUpRoutes(app *fiber.App, noteController controllers.NoteController, studentController controllers.StudentController) {
-	app.Post("/newNote", noteController.AddNote)
-	app.Get("/allStudents", studentController.GetAllStudents)
-	app.Post("/newStudent", studentController.AddStudent)
-
-	app.Get("/studentsGlobalAverages", noteController.GetStudentsGlobalAverages)
-	app.Get("/studentsUnitesAverages", noteController.GetStudentsUnitesAverages)
-	app.Get("/studentsCoursesAverages", noteController.GetStudentsCoursesAverages)
-
-	app.Get("/gobalAverage", noteController.GetGobalAverage)
-	app.Get("/uniteAverages", noteController.GetUniteAverages)
-	app.Get("/coursesAverages", noteController.GetCoursesAverages)
-
-	app.Get("/globalRanks", noteController.GetGlobalRankStudents)
-	app.Get("/unitesRanks", noteController.GetUnitesRankStudents)
-	app.Get("/coursesRanks", noteController.GetCoursesRankStudents)
-}
+const (
+	dbDriver     = "postgres"
+	dbSources    = "postgresql://user:password@university.grade.database.fr:5432/grade_dev?sslmode=disable"
+	serverAdress = "localhost:8080"
+)
 
 func main() {
-	DB := database.Init()
-
-	noteController := controllers.NewNoteController(DB)
-	studentControler := controllers.NewStudentController(DB)
-
-	app := fiber.New()
-
-	SetUpRoutes(app, noteController, studentControler)
-
-	err := app.Listen(":4000")
+	conn, err := sql.Open(dbDriver, dbSources)
 	if err != nil {
-		panic("Cannot start the application")
+		log.Fatal("cannot connect to db:", err)
+	}
+
+	store := grade_database.NewStore(conn)
+	server := api.NewServer(store)
+
+	err = server.Start(serverAdress)
+	if err != nil {
+		log.Fatal("cannot start server", err)
 	}
 }
