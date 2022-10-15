@@ -1,8 +1,8 @@
 CREATE TABLE "Grade" (
                          "id" SERIAL PRIMARY KEY,
                          "grade_number" int NOT NULL,
-                         "course_name" varchar,
-                         "student_id" int
+                         "course_name" varchar NOT NULL,
+                         "student_id" int NOT NULL
 );
 
 CREATE TABLE "Unite" (
@@ -13,7 +13,7 @@ CREATE TABLE "Unite" (
 CREATE TABLE "Course" (
                           "id" SERIAL PRIMARY KEY,
                           "course_name" varchar NOT NULL UNIQUE,
-                          "unite_id" int
+                          "unite_id" int NOT NULL
 );
 
 CREATE TABLE "Student" (
@@ -40,6 +40,13 @@ ALTER TABLE "Student_Course" ADD FOREIGN KEY ("Course_id") REFERENCES "Course" (
 CREATE TABLE "CourseAverage" (
                                  "id" SERIAL PRIMARY KEY,
                                  "course_name" varchar NOT NULL,
+                                 "average" int NOT NULL
+);
+
+CREATE TABLE "StudentCourseAverage" (
+                                 "id" SERIAL PRIMARY KEY,
+                                 "course_name" varchar NOT NULL,
+                                 "student_name" varchar NOT NULL,
                                  "average" int NOT NULL
 );
 

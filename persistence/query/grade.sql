@@ -23,6 +23,11 @@ SELECT * FROM "Grade" AS g
 WHERE g.course_name = $1
 ORDER BY g.id;
 
+-- name: StudentGradesCourse :many
+SELECT * FROM "Grade" AS g
+WHERE g.course_name = $1 AND g.student_id = $2
+ORDER BY g.id;
+
 -- name: UpdateGradeCourseName :one
 UPDATE "Grade"
 set course_name = $2

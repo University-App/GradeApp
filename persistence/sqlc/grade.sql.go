@@ -7,6 +7,7 @@ package grade_database
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createGrade = `-- name: CreateGrade :one
@@ -103,6 +104,45 @@ ORDER BY g.id
 
 func (q *Queries) ListGradesOfCourse(ctx context.Context, courseName string) ([]Grade, error) {
 	rows, err := q.db.QueryContext(ctx, listGradesOfCourse, courseName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Grade
+	for rows.Next() {
+		var i Grade
+		if err := rows.Scan(
+			&i.ID,
+			&i.GradeNumber,
+			&i.CourseName,
+			&i.StudentID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const studentGradesCourse = `-- name: StudentGradesCourse :many
+SELECT id, grade_number, course_name, student_id FROM "Grade" AS g
+WHERE g.course_name = $1 AND g.student_id = $2
+ORDER BY g.id
+`
+
+type StudentGradesCourseParams struct {
+	CourseName string
+	StudentID  sql.NullInt32
+}
+
+func (q *Queries) StudentGradesCourse(ctx context.Context, arg StudentGradesCourseParams) ([]Grade, error) {
+	rows, err := q.db.QueryContext(ctx, studentGradesCourse, arg.CourseName, arg.StudentID)
 	if err != nil {
 		return nil, err
 	}

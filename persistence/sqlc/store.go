@@ -44,6 +44,19 @@ type CourseAverageTxResult struct {
 	Average    int32  `json:"average"`
 }
 
+type StudentCourseAverageTxParams struct {
+	CourseName       string `json:"courseName"`
+	StudentFirstName string `json:"studentFirstName"`
+	StudentLastName  string `json:"studentLastName"`
+}
+
+type StudentCourseAverageTxResult struct {
+	ID          int32
+	CourseName  string `json:"courseName"`
+	Average     int32  `json:"average"`
+	StudentName string `json:"studentName"`
+}
+
 func (store *Store) CourseAverageTx(ctx context.Context, arg CourseAverageTxParams) (CourseAverageTxResult, error) {
 
 	var result CourseAverageTxResult
@@ -69,6 +82,48 @@ func (store *Store) CourseAverageTx(ctx context.Context, arg CourseAverageTxPara
 		}
 
 		result.ID = courseAverage.ID
+
+		return nil
+	})
+
+	return result, err
+}
+
+func (store *Store) StudentCourseAverageTx(ctx context.Context, arg StudentCourseAverageTxParams) (StudentCourseAverageTxResult, error) {
+
+	var result StudentCourseAverageTxResult
+
+	err := store.execTx(ctx, func(queries *Queries) error {
+
+		student, errGetStudent := queries.GetStudentByFirstLastName(ctx, GetStudentByFirstLastNameParams{
+			LastName:  arg.StudentLastName,
+			FirstName: arg.StudentFirstName,
+		})
+		if errGetStudent != nil {
+			return errGetStudent
+		}
+
+		studentlistGradesCourse, err := queries.StudentGradesCourse(ctx, StudentGradesCourseParams{CourseName: arg.CourseName, StudentID: sql.NullInt32{Int32: student.ID, Valid: true}})
+		if err != nil {
+			return err
+		}
+		for _, grade := range studentlistGradesCourse {
+			result.Average += grade.GradeNumber
+		}
+		result.Average /= int32(len(studentlistGradesCourse))
+		result.CourseName = arg.CourseName
+		result.StudentName = arg.StudentFirstName + " - " + arg.StudentLastName
+
+		studentCourseAverage, err := queries.CreateStudentCourseAverage(ctx, CreateStudentCourseAverageParams{
+			CourseName:  result.CourseName,
+			Average:     result.Average,
+			StudentName: result.StudentName,
+		})
+		if err != nil {
+			return err
+		}
+
+		result.ID = studentCourseAverage.ID
 
 		return nil
 	})

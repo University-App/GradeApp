@@ -42,6 +42,13 @@ CREATE TABLE "CourseAverage" (
                            "average" int NOT NULL
 );
 
+CREATE TABLE "StudentCourseAverage" (
+                                        "id" SERIAL PRIMARY KEY,
+                                        "course_name" varchar NOT NULL,
+                                        "student_name" varchar NOT NULL,
+                                        "average" int NOT NULL
+);
+
 ----------------------------------------------------------------------------------------
 /*
     SEEDING DEV DATABASE
