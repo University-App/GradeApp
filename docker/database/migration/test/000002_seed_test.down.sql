@@ -4,3 +4,4 @@ DROP TABLE IF EXISTS "Course";
 DROP TABLE IF EXISTS "Unite";
 DROP TABLE IF EXISTS "Student";
 DROP TABLE IF EXISTS "CourseAverage";
+DROP TABLE IF EXISTS "StudentCourseAverage";

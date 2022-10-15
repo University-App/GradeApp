@@ -38,6 +38,13 @@ type StudentCourse struct {
 	CourseID  int32
 }
 
+type StudentCourseAverage struct {
+	ID          int32
+	CourseName  string
+	StudentName string
+	Average     int32
+}
+
 type Unite struct {
 	ID        int32
 	UniteName string
